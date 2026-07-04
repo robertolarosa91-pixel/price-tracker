@@ -21,6 +21,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/test-db', async (req, res) => {
+  console.log('DEBUG - project_id:', serviceAccount.project_id);
+  console.log('DEBUG - client_email:', serviceAccount.client_email);
   try {
     await db.collection('test').doc('ping').set({ timestamp: new Date() });
     res.json({ status: 'ok', message: 'Connessione a Firestore riuscita' });
