@@ -23,6 +23,10 @@ app.get('/', (req, res) => {
 app.get('/test-db', async (req, res) => {
   console.log('DEBUG - project_id:', serviceAccount.project_id);
   console.log('DEBUG - client_email:', serviceAccount.client_email);
+  console.log('DEBUG - private_key length:', serviceAccount.private_key.length);
+  console.log('DEBUG - starts with BEGIN:', serviceAccount.private_key.startsWith('-----BEGIN PRIVATE KEY-----'));
+  console.log('DEBUG - ends with END:', serviceAccount.private_key.trim().endsWith('-----END PRIVATE KEY-----'));
+  console.log('DEBUG - newline count:', (serviceAccount.private_key.match(/\n/g) || []).length);
   try {
     await db.collection('test').doc('ping').set({ timestamp: new Date() });
     res.json({ status: 'ok', message: 'Connessione a Firestore riuscita' });
