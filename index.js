@@ -140,3 +140,31 @@ app.get('/products/:id/history', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server avviato sulla porta ${PORT}`);
 });
+
+app.get('/test-db-raw', async (req, res) => {
+  try {
+    const { GoogleAuth } = require('google-auth-library');
+    const auth = new GoogleAuth({
+      credentials: serviceAccount,
+      scopes: ['https://www.googleapis.com/auth/datastore']
+    });
+    const client = await auth.getClient();
+    const token = await client.getAccessToken();
+
+    const https = require('https');
+    const url = `https://firestore.googleapis.com/v1/projects/${serviceAccount.project_id}/databases/default/documents/test`;
+
+    https.get(url, { headers: { Authorization: `Bearer ${token.token}` } }, (r) => {
+      let data = '';
+      r.on('data', chunk => data += chunk);
+      r.on('end', () => {
+        console.log('RAW RESPONSE:', data);
+        res.status(r.statusCode).send(data);
+      });
+    }).on('error', (err) => {
+      res.status(500).json({ error: err.message });
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message, stack: err.stack });
+  }
+});
